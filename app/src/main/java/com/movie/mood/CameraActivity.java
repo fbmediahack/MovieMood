@@ -10,7 +10,6 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import de.toman.milight.WiFiBox;
 
@@ -42,7 +41,6 @@ public class CameraActivity extends AppCompatActivity {
             @Override public void onImageCaptured(Bitmap bitmap) {
                 if(bitmap != null) {
 
-                    Log.d("BITMAP", "got bitmap");
                     final int[] dominantColors = colourAverager.getDomnantColor(bitmap, 2);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -58,8 +56,6 @@ public class CameraActivity extends AppCompatActivity {
                     Color.colorToHSV(dominantColors[1], rightHsv);
 
                     setLightsColor(lefthsv, rightHsv);
-                } else {
-                    Log.d("BITMAP", "no bitmap");
                 }
 
             }

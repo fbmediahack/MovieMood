@@ -49,7 +49,7 @@ public class LightIntentService extends IntentService {
             return;
         }
         long millis = intent.getLongExtra(EXTRA_MILLIS, 0);
-        if (SystemClock.elapsedRealtime() - millis > 400L) { // Prevent queue build-up.
+        if (SystemClock.elapsedRealtime() - millis > 10L) { // Prevent queue build-up.
             return;
         }
         int group = intent.getIntExtra(EXTRA_GROUP, 0);
