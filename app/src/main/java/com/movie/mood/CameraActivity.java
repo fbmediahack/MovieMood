@@ -17,6 +17,7 @@ import de.toman.milight.WiFiBox;
 public class CameraActivity extends AppCompatActivity {
 
     ColourAverager colourAverager = new ColourAverager();
+    private Camera2BasicFragment mFrag;
 
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,25 +26,30 @@ public class CameraActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_camera);
 
-        Camera2BasicFragment frag;
         if (savedInstanceState == null) {
-            frag = Camera2BasicFragment.newInstance();
+            mFrag = Camera2BasicFragment.newInstance();
 
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, frag, "camerafrag")
+                    .add(R.id.container, mFrag, "camerafrag")
                     .commit();
         } else {
-            frag = (Camera2BasicFragment) getFragmentManager().findFragmentByTag("camerafrag");
+            mFrag = (Camera2BasicFragment) getFragmentManager().findFragmentByTag("camerafrag");
         }
 
 
-        frag.setOnImageCapturedListener(new OnImageCapturedListener() {
+        mFrag.setOnImageCapturedListener(new OnImageCapturedListener() {
 
             @Override public void onImageCaptured(Bitmap bitmap) {
                 if(bitmap != null) {
 
                     Log.d("BITMAP", "got bitmap");
                     final int[] dominantColors = colourAverager.getDomnantColor(bitmap, 2);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mFrag.setDebugColors(dominantColors[0], dominantColors[1]);
+                        }
+                    });
 
                     float[] lefthsv = new float[3];
                     Color.colorToHSV(dominantColors[0], lefthsv);
