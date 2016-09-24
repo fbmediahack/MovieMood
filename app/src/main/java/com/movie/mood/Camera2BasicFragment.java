@@ -235,8 +235,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         public void onImageAvailable(ImageReader reader) {
 
             Image image = reader.acquireNextImage();
+            mBackgroundHandler.removeCallbacks(null);
             mBackgroundHandler.post(new ImageSaver(image));
-
         }
 
     };
@@ -334,8 +334,6 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         }
 
     };
-    private File mFile;
-    private View button;
 
     /**
      * Shows a {@link Toast} on the UI thread.
@@ -399,6 +397,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
 //            Log.e(TAG, "Couldn't find any suitable preview size");
 //            return choices[0];
 //        }
+        System.out.println("choosing preview size " + choices[choices.length - 1]);
         return choices[choices.length - 1];
     }
 
@@ -417,18 +416,12 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        button = view.findViewById(R.id.picture);
+        final View button = view.findViewById(R.id.picture);
         button.setOnClickListener(new OnClickListener() {
             @Override public void onClick(View v) {
                 capturePreview = true;
             }
         });
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
     }
 
     @Override
@@ -695,15 +688,13 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                             mCaptureSession = cameraCaptureSession;
                             try {
                                 // Auto focus should be continuous for camera preview.
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                                 // Flash is automatically enabled when necessary.
                                 setAutoFlash(mPreviewRequestBuilder);
 
                                 // Finally, we start displaying the camera preview.
                                 mPreviewRequest = mPreviewRequestBuilder.build();
-                                mCaptureSession.setRepeatingRequest(mPreviewRequest,
-                                        mCaptureCallback, mBackgroundHandler);
+                                mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
                             } catch (CameraAccessException e) {
                                 e.printStackTrace();
                             }
