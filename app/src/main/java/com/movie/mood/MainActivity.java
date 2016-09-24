@@ -1,5 +1,6 @@
 package com.movie.mood;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -24,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
         image = (ImageView) findViewById(R.id.image);
         left = findViewById(R.id.left);
         right = findViewById(R.id.right);
+
+        findViewById(R.id.button_camera).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CameraActivity.class));
+            }
+        });
     }
 
     @Override protected void onResume() {
