@@ -78,6 +78,9 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
 
+    private View mLeftColor;
+    private View mRightColor;
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -339,6 +342,11 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
 
     };
 
+    public void setDebugColors(int left, int right) {
+        mLeftColor.setBackgroundColor(left);
+        mRightColor.setBackgroundColor(right);
+    }
+
     /**
      * Shows a {@link Toast} on the UI thread.
      *
@@ -415,18 +423,11 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
     }
 
-    boolean capturePreview = false;
-
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        final View button = view.findViewById(R.id.picture);
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                capturePreview = true;
-            }
-        });
+        mLeftColor = view.findViewById(R.id.left);
+        mRightColor = view.findViewById(R.id.right);
     }
 
     @Override
