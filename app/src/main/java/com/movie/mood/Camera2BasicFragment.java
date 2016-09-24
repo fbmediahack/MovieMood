@@ -283,15 +283,17 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                     Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
                     if (afState == null) {
 //                        captureStillPicture();
-                    } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
-                            CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
+                    }
+                    else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
+                        CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
                         // CONTROL_AE_STATE can be null on some devices
                         Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
                         if (aeState == null ||
-                                aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
+                            aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
                             mState = STATE_PICTURE_TAKEN;
 //                            captureStillPicture();
-                        } else {
+                        }
+                        else {
                             runPrecaptureSequence();
                         }
                     }
@@ -301,8 +303,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                     // CONTROL_AE_STATE can be null on some devices
                     Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
                     if (aeState == null ||
-                            aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
-                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+                        aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
+                        aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
                         mState = STATE_WAITING_NON_PRECAPTURE;
                     }
                     break;
@@ -418,7 +420,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         final View button = view.findViewById(R.id.picture);
         button.setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 capturePreview = true;
             }
         });
@@ -435,7 +438,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         // the SurfaceTextureListener).
         if (mTextureView.isAvailable()) {
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
-        } else {
+        }
+        else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
     }
@@ -450,9 +454,10 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
     private void requestCameraPermission() {
         if (FragmentCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
-        } else {
+        }
+        else {
             FragmentCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    REQUEST_CAMERA_PERMISSION);
+                REQUEST_CAMERA_PERMISSION);
         }
     }
 
@@ -463,7 +468,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 ErrorDialog.newInstance("give me the permission").show(getChildFragmentManager(), FRAGMENT_DIALOG);
             }
-        } else {
+        }
+        else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -551,16 +557,17 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
-                        maxPreviewHeight, smallest);
+                    maxPreviewHeight, smallest);
 
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     mTextureView.setAspectRatio(
-                            mPreviewSize.getWidth(), mPreviewSize.getHeight());
-                } else {
+                        mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                }
+                else {
                     mTextureView.setAspectRatio(
-                            mPreviewSize.getHeight(), mPreviewSize.getWidth());
+                        mPreviewSize.getHeight(), mPreviewSize.getWidth());
                 }
 
                 // Check if the flash is supported.
@@ -570,13 +577,15 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                 mCameraId = cameraId;
                 return;
             }
-        } catch (CameraAccessException e) {
+        }
+        catch (CameraAccessException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
             ErrorDialog.newInstance("camera error!!")
-                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+                .show(getChildFragmentManager(), FRAGMENT_DIALOG);
             e.printStackTrace();
         }
     }
@@ -586,7 +595,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
      */
     private void openCamera(int width, int height) {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission();
             return;
         }
@@ -599,9 +608,11 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
             manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
-        } catch (CameraAccessException e) {
+        }
+        catch (CameraAccessException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
         }
     }
@@ -624,9 +635,11 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                 mImageReader.close();
                 mImageReader = null;
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
-        } finally {
+        }
+        finally {
             mCameraOpenCloseLock.release();
         }
     }
@@ -649,7 +662,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             mBackgroundThread.join();
             mBackgroundThread = null;
             mBackgroundHandler = null;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -675,39 +689,41 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
 
             // Here, we create a CameraCaptureSession for camera preview.
             mCameraDevice.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()),
-                    new CameraCaptureSession.StateCallback() {
+                new CameraCaptureSession.StateCallback() {
 
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                            // The camera is already closed
-                            if (null == mCameraDevice) {
-                                return;
-                            }
-
-                            // When the session is ready, we start displaying the preview.
-                            mCaptureSession = cameraCaptureSession;
-                            try {
-                                // Auto focus should be continuous for camera preview.
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                                // Flash is automatically enabled when necessary.
-                                setAutoFlash(mPreviewRequestBuilder);
-
-                                // Finally, we start displaying the camera preview.
-                                mPreviewRequest = mPreviewRequestBuilder.build();
-                                mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
+                    @Override
+                    public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
+                        // The camera is already closed
+                        if (null == mCameraDevice) {
+                            return;
                         }
 
-                        @Override
-                        public void onConfigureFailed(
-                                @NonNull CameraCaptureSession cameraCaptureSession) {
-                            showToast("Failed");
+                        // When the session is ready, we start displaying the preview.
+                        mCaptureSession = cameraCaptureSession;
+                        try {
+                            // Auto focus should be continuous for camera preview.
+                            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                            // Flash is automatically enabled when necessary.
+                            setAutoFlash(mPreviewRequestBuilder);
+
+                            // Finally, we start displaying the camera preview.
+                            mPreviewRequest = mPreviewRequestBuilder.build();
+                            mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
                         }
-                    }, null
+                        catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onConfigureFailed(
+                        @NonNull CameraCaptureSession cameraCaptureSession) {
+                        showToast("Failed");
+                    }
+                }, null
             );
-        } catch (CameraAccessException e) {
+        }
+        catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
@@ -735,11 +751,12 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
+                (float) viewHeight / mPreviewSize.getHeight(),
+                (float) viewWidth / mPreviewSize.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-        } else if (Surface.ROTATION_180 == rotation) {
+        }
+        else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180, centerX, centerY);
         }
         mTextureView.setTransform(matrix);
@@ -754,12 +771,13 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         try {
             // This is how to tell the camera to trigger.
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
             // Tell #mCaptureCallback to wait for the precapture sequence to be set.
             mState = STATE_WAITING_PRECAPTURE;
             mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback,
-                    mBackgroundHandler);
-        } catch (CameraAccessException e) {
+                mBackgroundHandler);
+        }
+        catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
@@ -767,7 +785,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
         if (mFlashSupported) {
             requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
         }
     }
 
@@ -780,6 +798,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
          * The JPEG image
          */
         private final Image mImage;
+        private Bitmap mBitmap;
 
         public ImageSaver(Image image) {
             mImage = image;
@@ -797,9 +816,13 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
             try {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                onImageCapturedListener.onImageCaptured(bitmap); //TODO post to another thread
-            } finally {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inBitmap = mBitmap;
+                options.inMutable = true;
+                mBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                onImageCapturedListener.onImageCaptured(mBitmap); //TODO post to another thread
+            }
+            finally {
                 mImage.close();
             }
         }
@@ -849,14 +872,14 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Activity activity = getActivity();
             return new AlertDialog.Builder(activity)
-                    .setMessage(getArguments().getString(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.finish();
-                        }
-                    })
-                    .create();
+                .setMessage(getArguments().getString(ARG_MESSAGE))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        activity.finish();
+                    }
+                })
+                .create();
         }
 
     }
@@ -870,26 +893,26 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Fragment parent = getParentFragment();
             return new AlertDialog.Builder(getActivity())
-                    .setMessage("Give me the permission!")
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                .setMessage("Give me the permission!")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FragmentCompat.requestPermissions(parent,
+                            new String[]{Manifest.permission.CAMERA},
+                            REQUEST_CAMERA_PERMISSION);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel,
+                    new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            FragmentCompat.requestPermissions(parent,
-                                    new String[]{Manifest.permission.CAMERA},
-                                    REQUEST_CAMERA_PERMISSION);
+                            Activity activity = parent.getActivity();
+                            if (activity != null) {
+                                activity.finish();
+                            }
                         }
                     })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Activity activity = parent.getActivity();
-                                    if (activity != null) {
-                                        activity.finish();
-                                    }
-                                }
-                            })
-                    .create();
+                .create();
         }
     }
 
