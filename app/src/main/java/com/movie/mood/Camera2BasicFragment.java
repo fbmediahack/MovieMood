@@ -231,12 +231,16 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
      */
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
 
-        @Override
-        public void onImageAvailable(ImageReader reader) {
+        ImageSaver imageSaver = new ImageSaver();
 
+        @Override
+
+        public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireNextImage();
-            mBackgroundHandler.removeCallbacks(null);
-            mBackgroundHandler.post(new ImageSaver(image));
+            imageSaver.setImage(image);
+
+            mBackgroundHandler.removeCallbacksAndMessages(imageSaver);
+            mBackgroundHandler.post(imageSaver);
         }
 
     };
@@ -418,7 +422,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         final View button = view.findViewById(R.id.picture);
         button.setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 capturePreview = true;
             }
         });
@@ -779,10 +784,11 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         /**
          * The JPEG image
          */
-        private final Image mImage;
+        private Image mImage;
+        private Bitmap mBitmap;
+        private byte[] bytes;
 
-        public ImageSaver(Image image) {
-            mImage = image;
+        public ImageSaver() {
         }
 
         @Override
@@ -794,16 +800,28 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             }
 
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
+
+            int bufferSize = buffer.remaining();
+            if (bytes == null || bytes.length < bufferSize) {
+                bytes = new byte[bufferSize];
+            }
+
+            buffer.get(bytes, 0, bufferSize);
+
             try {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                onImageCapturedListener.onImageCaptured(bitmap); //TODO post to another thread
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inBitmap = mBitmap;
+                options.inMutable = true;
+                mBitmap = BitmapFactory.decodeByteArray(bytes, 0, bufferSize, options);
+                onImageCapturedListener.onImageCaptured(mBitmap); //TODO post to another thread
             } finally {
                 mImage.close();
             }
         }
 
+        public void setImage(Image mImage) {
+            this.mImage = mImage;
+        }
     }
 
     OnImageCapturedListener onImageCapturedListener;
