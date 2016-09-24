@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         image = (ImageView) findViewById(R.id.image);
         left = findViewById(R.id.left);
         right = findViewById(R.id.right);
@@ -35,10 +34,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onResume() {
         super.onResume();
-        Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
 
-        final int color = colourAverager.averagePixelsInImage(bitmap);
-        left.setBackgroundColor(color);
-        right.setBackgroundColor(color);
+        final Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
+
+        final int dominantColor = colourAverager.getDominantColor(bitmap);
+        left.setBackgroundColor(dominantColor);
+
+       // final int[] color = colourAverager.averagePixelsInImage(bitmap, 2);
+        //left.setBackgroundColor(color[0]);
+        //right.setBackgroundColor(color[1]);
     }
 }
