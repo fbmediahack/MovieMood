@@ -26,6 +26,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -60,8 +62,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -235,13 +235,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         public void onImageAvailable(ImageReader reader) {
 
             Image image = reader.acquireNextImage();
-
-            if (capturePreview) {
-                capturePreview = false;
-                mBackgroundHandler.post(new ImageSaver(image, mFile));
-            } else {
-                image.close();
-            }
+            mBackgroundHandler.post(new ImageSaver(image));
 
         }
 
@@ -789,43 +783,48 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
-    private static class ImageSaver implements Runnable {
+    private class ImageSaver implements Runnable {
 
         /**
          * The JPEG image
          */
         private final Image mImage;
-        private final File mFile;
 
-        public ImageSaver(Image image, File mFile) {
+        public ImageSaver(Image image) {
             mImage = image;
-            this.mFile = mFile;
         }
 
         @Override
         public void run() {
+
+            if (onImageCapturedListener == null) {
+                mImage.close();
+                return;
+            }
+
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-            FileOutputStream output = null;
             try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                onImageCapturedListener.onImageCaptured(bitmap); //TODO post to another thread
             } finally {
                 mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
 
     }
+
+    OnImageCapturedListener onImageCapturedListener;
+
+    public void setOnImageCapturedListener(OnImageCapturedListener onImageCapturedListener) {
+        this.onImageCapturedListener = onImageCapturedListener;
+    }
+
+    public interface OnImageCapturedListener {
+        void onImageCaptured(Bitmap bitmap);
+    }
+
 
     /**
      * Compares two {@code Size}s based on their areas.
