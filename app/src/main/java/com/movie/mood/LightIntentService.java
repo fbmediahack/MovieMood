@@ -36,13 +36,7 @@ public class LightIntentService extends IntentService {
     public LightIntentService() {
         super(NAME);
         try {
-            // Possible addresses.
-//            wiFiBox = new WiFiBox("192.168.0.137");
-//            wiFiBox = new WiFiBox("192.168.0.121");
-//            wiFiBox = new WiFiBox("192.168.0.125");
             wiFiBox = new WiFiBox("192.168.0.122");
-//            wiFiBox = new WiFiBox("192.168.0.106");
-//            wiFiBox = new WiFiBox("192.168.0.142");
             hostOk = true;
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -65,10 +59,10 @@ public class LightIntentService extends IntentService {
         try {
             switch (command) {
                 case COMMAND_BRIGHTNESS:
-                    wiFiBox.brightness(value);
+                    wiFiBox.brightness(group, value);
                     break;
                 case COMMAND_COLOUR:
-                    wiFiBox.color( value);
+                    wiFiBox.color(group, value);
                     break;
             }
         } catch (IOException e) {
