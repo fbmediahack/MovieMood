@@ -42,14 +42,15 @@ public class MainActivity extends AppCompatActivity {
 
         final Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
 
-        final int[] color = colourAverager.averagePixelsInImage(bitmap, 2);
+        final int[] color = colourAverager.getDomnantColor(bitmap, 2);
         left.setBackgroundColor(color[0]);
         right.setBackgroundColor(color[1]);
+
         Intent intent = new Intent(this, LightIntentService.class);
         intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
         intent.putExtra(LightIntentService.EXTRA_GROUP, 1);
         intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_BRIGHTNESS);
-        intent.putExtra(LightIntentService.EXTRA_VALUE, WiFiBox.MAX_BRIGHTNESS/5);
+        intent.putExtra(LightIntentService.EXTRA_VALUE, WiFiBox.MAX_BRIGHTNESS / 5);
         startService(intent);
 
         intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
