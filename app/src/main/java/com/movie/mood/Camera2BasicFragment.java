@@ -26,6 +26,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -60,8 +62,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -235,13 +235,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         public void onImageAvailable(ImageReader reader) {
 
             Image image = reader.acquireNextImage();
-
-            if (capturePreview) {
-                capturePreview = false;
-                mBackgroundHandler.post(new ImageSaver(image, mFile));
-            } else {
-                image.close();
-            }
+            mBackgroundHandler.post(new ImageSaver(image));
 
         }
 
@@ -500,15 +494,16 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                     continue;
                 }
 
-                StreamConfigurationMap map = characteristics.get(
-                        CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (map == null) {
                     continue;
                 }
 
-                // For still image captures, we use the largest available size.
-                Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizesByArea());
-                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.RGB_565, /*maxImages*/2);
+                int imageFormat = ImageFormat.JPEG;
+
+                // For still image captures, we use the smallest available size.
+                Size smallest = Collections.min(Arrays.asList(map.getOutputSizes(imageFormat)), new CompareSizesByArea());
+                mImageReader = ImageReader.newInstance(smallest.getWidth(), smallest.getHeight(), imageFormat, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
@@ -562,9 +557,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
                 // garbage capture data.
-                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                        rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
-                        maxPreviewHeight, largest);
+                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
+                        maxPreviewHeight, smallest);
 
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = getResources().getConfiguration().orientation;
@@ -590,6 +584,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             // device this code runs.
             ErrorDialog.newInstance("camera error!!")
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            e.printStackTrace();
         }
     }
 
@@ -788,43 +783,48 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
-    private static class ImageSaver implements Runnable {
+    private class ImageSaver implements Runnable {
 
         /**
          * The JPEG image
          */
         private final Image mImage;
-        private final File mFile;
 
-        public ImageSaver(Image image, File mFile) {
+        public ImageSaver(Image image) {
             mImage = image;
-            this.mFile = mFile;
         }
 
         @Override
         public void run() {
+
+            if (onImageCapturedListener == null) {
+                mImage.close();
+                return;
+            }
+
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
-            FileOutputStream output = null;
             try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                onImageCapturedListener.onImageCaptured(bitmap); //TODO post to another thread
             } finally {
                 mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
 
     }
+
+    OnImageCapturedListener onImageCapturedListener;
+
+    public void setOnImageCapturedListener(OnImageCapturedListener onImageCapturedListener) {
+        this.onImageCapturedListener = onImageCapturedListener;
+    }
+
+    public interface OnImageCapturedListener {
+        void onImageCaptured(Bitmap bitmap);
+    }
+
 
     /**
      * Compares two {@code Size}s based on their areas.
