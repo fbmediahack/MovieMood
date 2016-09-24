@@ -48,15 +48,15 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, LightIntentService.class);
         intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
-        intent.putExtra(LightIntentService.EXTRA_GROUP, 2);
+        intent.putExtra(LightIntentService.EXTRA_GROUP, 1);
         intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_BRIGHTNESS);
         intent.putExtra(LightIntentService.EXTRA_VALUE, WiFiBox.MAX_BRIGHTNESS);
         startService(intent);
 
         intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
-        intent.putExtra(LightIntentService.EXTRA_GROUP, 2);
-        intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_COLOUR);
-        intent.putExtra(LightIntentService.EXTRA_VALUE, 0xc0);
+        intent.putExtra(LightIntentService.EXTRA_GROUP, 1);
+        intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_WHITE);
+//        intent.putExtra(LightIntentService.EXTRA_VALUE, 0x70);
         startService(intent);
     }
 }

@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.IntDef;
-import android.util.Log;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -21,12 +20,13 @@ public class LightIntentService extends IntentService {
     public static final String EXTRA_MILLIS = "de.toman.milight.WiFiBox.MILLIS";
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({COMMAND_COLOUR, COMMAND_BRIGHTNESS})
+    @IntDef({COMMAND_COLOUR, COMMAND_BRIGHTNESS, COMMAND_WHITE})
     public @interface Command {
     }
 
-    public static final int COMMAND_COLOUR = 2;
-    public static final int COMMAND_BRIGHTNESS = 3;
+    public static final int COMMAND_COLOUR = 1;
+    public static final int COMMAND_BRIGHTNESS = 2;
+    public static final int COMMAND_WHITE = 3;
 
     private static final String NAME = "LightIntentService";
 
@@ -55,7 +55,6 @@ public class LightIntentService extends IntentService {
         int group = intent.getIntExtra(EXTRA_GROUP, 0);
         int command = intent.getIntExtra(EXTRA_COMMAND, 0);
         int value = intent.getIntExtra(EXTRA_VALUE, 0);
-        Log.i("LightIntentService", "G C V = " + group + " " + command + " " + value);
         try {
             switch (command) {
                 case COMMAND_BRIGHTNESS:
@@ -63,6 +62,9 @@ public class LightIntentService extends IntentService {
                     break;
                 case COMMAND_COLOUR:
                     wiFiBox.color(group, value);
+                    break;
+                case COMMAND_WHITE:
+                    wiFiBox.white(group);
                     break;
             }
         } catch (IOException e) {
