@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.IntDef;
+import android.util.Log;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -35,7 +36,13 @@ public class LightIntentService extends IntentService {
     public LightIntentService() {
         super(NAME);
         try {
-            wiFiBox = new WiFiBox("192.168.0.0");
+            // Possible addresses.
+//            wiFiBox = new WiFiBox("192.168.0.137");
+//            wiFiBox = new WiFiBox("192.168.0.121");
+//            wiFiBox = new WiFiBox("192.168.0.125");
+            wiFiBox = new WiFiBox("192.168.0.122");
+//            wiFiBox = new WiFiBox("192.168.0.106");
+//            wiFiBox = new WiFiBox("192.168.0.142");
             hostOk = true;
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -54,13 +61,14 @@ public class LightIntentService extends IntentService {
         int group = intent.getIntExtra(EXTRA_GROUP, 0);
         int command = intent.getIntExtra(EXTRA_COMMAND, 0);
         int value = intent.getIntExtra(EXTRA_VALUE, 0);
+        Log.i("LightIntentService", "G C V = " + group + " " + command + " " + value);
         try {
             switch (command) {
                 case COMMAND_BRIGHTNESS:
-                    wiFiBox.brightness(group, value);
+                    wiFiBox.brightness(value);
                     break;
                 case COMMAND_COLOUR:
-                    wiFiBox.color(group, value);
+                    wiFiBox.color( value);
                     break;
             }
         } catch (IOException e) {
