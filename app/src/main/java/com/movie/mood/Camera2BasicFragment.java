@@ -497,7 +497,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                     continue;
                 }
 
-                int imageFormat = ImageFormat.JPEG;
+                int imageFormat = ImageFormat.YUV_420_888;
 
                 // For still image captures, we use the smallest available size.
                 Size smallest = Collections.min(Arrays.asList(map.getOutputSizes(imageFormat)), new CompareSizesByArea());
@@ -785,7 +785,6 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
          * The JPEG image
          */
         private Image mImage;
-        private Bitmap mBitmap;
         private byte[] bytes;
 
         public ImageSaver() {
@@ -809,10 +808,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             buffer.get(bytes, 0, bufferSize);
 
             try {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inBitmap = mBitmap;
-                options.inMutable = true;
-                mBitmap = BitmapFactory.decodeByteArray(bytes, 0, bufferSize, options);
+                Bitmap mBitmap = BitmapFactory.decodeByteArray(bytes, 0, bufferSize);
                 onImageCapturedListener.onImageCaptured(mBitmap); //TODO post to another thread
             } finally {
                 mImage.close();
