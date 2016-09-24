@@ -86,9 +86,6 @@ public class ColourAverager {
     }
 
     public int[] getDomnantColor(Bitmap bitmap, int bands) {
-        Log.d(TAG, "start");
-        final long startTime = System.currentTimeMillis();
-
         final int width = bitmap.getWidth();
         final int height = bitmap.getHeight();
 
@@ -102,7 +99,6 @@ public class ColourAverager {
             results[bandIndex] = getDominantColor(band);
             band.recycle();
         }
-        Log.d(TAG, "finish =  " + (System.currentTimeMillis() - startTime));
         return results;
     }
 

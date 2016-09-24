@@ -32,7 +32,7 @@ public class WiFiBox {
 	 * The sleep time between both messages for switching lights to the white
 	 * mode.
 	 */
-	public static final int DEFAULT_SLEEP_BETWEEN_MESSAGES = 0;
+	public static final int DEFAULT_SLEEP_BETWEEN_MESSAGES = 20;
 
 	/**
 	 * The command code for "RGBW COLOR LED ALL OFF".

@@ -6,12 +6,9 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-
-import de.toman.milight.WiFiBox;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,70 +46,18 @@ public class MainActivity extends AppCompatActivity {
         left.setBackgroundColor(color[0]);
         right.setBackgroundColor(color[1]);
 
-
-        float[] lefthsv = new float[3];
-        Color.colorToHSV(Color.BLUE, lefthsv);
-
-        float[] righthsv = new float[3];
-        Color.colorToHSV(Color.RED, righthsv);
-
-        setLightsColor(lefthsv, righthsv);
+        sendColors(Color.BLUE, Color.RED);
     }
 
-    private void setLightsColor(float[] lefthsv, float[] righthsv) {
+
+    private void sendColors(int leftColor, int rightColor) {
         Intent intent = new Intent(this, LightIntentService.class);
-        setBrightness(intent, true, lefthsv[2]);
-
-        if (lefthsv[1] > 0.25f ) {
-            setLightColor(true, lefthsv[0], intent);
-        } else {
-            setWhite(true, intent);
-        }
-
-        setBrightness(intent, false, righthsv[2]);
-
-        if (lefthsv[1] > 0.25f ) {
-            setLightColor(false, righthsv[0], intent);
-        } else {
-            setWhite(false, intent);
-        }
-
+        intent.putExtra(LightIntentService.LEFT_COLOR, leftColor);
+        intent.putExtra(LightIntentService.RIGHT_COLOR, rightColor);
+        intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
         startService(intent);
     }
 
-    private void setWhite(boolean left, Intent intent) {
-        intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
-        intent.putExtra(LightIntentService.EXTRA_GROUP, left ? 1 : 2);
-        intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_WHITE);
-    }
-
-    private void setLightColor(boolean left, float hue, Intent intent) {
-        intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
-        intent.putExtra(LightIntentService.EXTRA_GROUP, left ? 1 : 2);
-        intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_COLOUR);
-        intent.putExtra(LightIntentService.EXTRA_VALUE, (int) correctColor(hue));
-    }
-    
-    @NonNull private Intent setBrightness(Intent intent, boolean left, float brightness) {
-        intent.putExtra(LightIntentService.EXTRA_MILLIS, SystemClock.elapsedRealtime());
-        intent.putExtra(LightIntentService.EXTRA_GROUP, left ? 1 : 2);
-        intent.putExtra(LightIntentService.EXTRA_COMMAND, LightIntentService.COMMAND_BRIGHTNESS);
-        intent.putExtra(LightIntentService.EXTRA_VALUE, (int)(WiFiBox.MAX_BRIGHTNESS * brightness));
-        startService(intent);
-        return intent;
-    }
-
-    int correctColor(float hue) {
-        return shift(normalise(hue)) ;
-    }
-
-    int normalise(float h) {
-        return (int) ((h /360) * 255);
-    }
-
-    int shift(int c) {
-        return ((255 - c) - 80 + 255) % 256;
-    }
 }
 
 
