@@ -497,7 +497,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
                     continue;
                 }
 
-                int imageFormat = ImageFormat.YUV_420_888;
+                int imageFormat = ImageFormat.JPEG;
 
                 // For still image captures, we use the smallest available size.
                 Size smallest = Collections.min(Arrays.asList(map.getOutputSizes(imageFormat)), new CompareSizesByArea());
