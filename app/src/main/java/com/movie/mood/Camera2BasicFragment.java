@@ -422,7 +422,8 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         final View button = view.findViewById(R.id.picture);
         button.setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 capturePreview = true;
             }
         });
@@ -784,6 +785,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
          * The JPEG image
          */
         private Image mImage;
+        private Bitmap mBitmap;
         private byte[] bytes;
 
         public ImageSaver() {
@@ -798,6 +800,7 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             }
 
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+
             int bufferSize = buffer.remaining();
             if (bytes == null || bytes.length < bufferSize) {
                 bytes = new byte[bufferSize];
@@ -806,8 +809,11 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
             buffer.get(bytes, 0, bufferSize);
 
             try {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bufferSize);
-                onImageCapturedListener.onImageCaptured(bitmap); //TODO post to another thread
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inBitmap = mBitmap;
+                options.inMutable = true;
+                mBitmap = BitmapFactory.decodeByteArray(bytes, 0, bufferSize, options);
+                onImageCapturedListener.onImageCaptured(mBitmap); //TODO post to another thread
             } finally {
                 mImage.close();
             }
