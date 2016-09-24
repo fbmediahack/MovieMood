@@ -86,14 +86,33 @@ public class ColourAverager {
         return generate;
     }
 
-    public int getDominantColor(Bitmap bitmap) {
+
+    public int[] getDomnantColor(Bitmap bitmap, int bands) {
         Log.d(TAG, "start");
         final long startTime = System.currentTimeMillis();
+
+        final int width = bitmap.getWidth();
+        final int height = bitmap.getHeight();
+
+        final int bandWidth = width / bands;
+
+        int[] results = new int[bands];
+
+        for (int bandIndex = 0; bandIndex < bands; bandIndex++) {
+            int bandStart = bandIndex * bandWidth;
+            Bitmap band = Bitmap.createBitmap(bitmap, bandStart, 0, bandWidth, height);
+            results[bandIndex] = getDominantColor(band);
+            band.recycle();
+        }
+        Log.d(TAG, "finish =  " + (System.currentTimeMillis() - startTime) );
+        return results;
+    }
+
+
+    public int getDominantColor(Bitmap bitmap) {
         Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, 1, 1, true);
         final int color = newBitmap.getPixel(0, 0);
         newBitmap.recycle();
-
-        Log.d(TAG, "finish =  " + (System.currentTimeMillis() - startTime));
         return color;
     }
 }

@@ -37,11 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
         final Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
 
-        final int dominantColor = colourAverager.getDominantColor(bitmap);
-        left.setBackgroundColor(dominantColor);
-
-       // final int[] color = colourAverager.averagePixelsInImage(bitmap, 2);
-        //left.setBackgroundColor(color[0]);
-        //right.setBackgroundColor(color[1]);
+        final int[] color = colourAverager.getDomnantColor(bitmap, 2);
+        left.setBackgroundColor(color[0]);
+        right.setBackgroundColor(color[1]);
+        
     }
 }
