@@ -415,18 +415,9 @@ public class Camera2BasicFragment extends Fragment implements FragmentCompat.OnR
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
     }
 
-    boolean capturePreview = false;
-
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        final View button = view.findViewById(R.id.picture);
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                capturePreview = true;
-            }
-        });
     }
 
     @Override
